@@ -292,5 +292,3 @@ For example, under Windows, [this image](http://i.imgur.com/IT4IOgc.png?1) shows
 <!--  LocalWords:  knitr Sweave PDF PDFs PDFBox CSV
  -->
 
-
-    
