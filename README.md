@@ -4,13 +4,11 @@ filleR
 Filling a (fllat) PDF form with data from a CSV file in R
 
 
-Filling a form with data from a CSV file in R
-
 
 Introduction
 ============
 
-Don't get me wrong I am a fan of knitr (former user of Sweave), but there are situations when they might just  not fit the purpose.
+Don't get me wrong I am a fan of [knitr](http://yihui.name/knitr/) (and former user of [Sweave](http://www.stat.uni-muenchen.de/~leisch/Sweave/)), but there are situations when they might just  not fit the purpose.
 
 Indeed, as LaTeX based tools, they lie on the principle that content is more important than presentation, or better presentation technicalities. The latter  should not occupy  the researchers' time and be delegated to a mostly predefined model.
 
@@ -28,7 +26,7 @@ In the following I will show how to read a data from a spreadsheet in CSV format
 
 
 
-Writing on the bored of your page
+Writing on the border of your page
 =================================
 
 Saving a figure as a PDF is nothing new for you and most likely you know that you can write a blank plot with `plot.new()` and add text to it with `text()`. The problem is that R adds white spaces every here and there aesthetic reasons; but, if you need to fill a form, you need to write your text exactly `n` inch from the borders and not `n` plus some offset. Obviously you have two alternatives: you adjust the your text printing command to take into account R white offsets; you set all  offsets to zero. The former is impractical also because the offset is in percent, so it is not a matter of simple subtracting a given delta.
@@ -220,7 +218,7 @@ The template for the CSV data is as follows:
     -1
     ... start again
 
-For a usable 2 pages CSV see XXXXXhere.
+For a usable 2 pages CSV see [here](https://github.com/AntonioFasano/filleR/blob/master/form.csv).
 
 The form XXXXbefore and XXXafter filling (unfortunately not in English).
 
@@ -277,8 +275,10 @@ Read the full code on github FilleR
 Final considerations
 ====================
 
-To postion your text properly on the PDF you may take advantage of the distance tools, present in many PDF applications, including some free ones.
+To position your text properly on the PDF you may take advantage of the distance tools, present in many PDF applications, including some free ones.
 
-For example this image shows this tool usign the free XXXXXXXXXXXX
+For example, under windows, [this image](http://i.imgur.com/IT4IOgc.png?1)
+
+shows this tool using the free [PDF-XChange Viewer](http://www.tracker-software.com/product/pdf-xchange-viewer)
 
 
