@@ -1,6 +1,7 @@
 filleR
 ======
 
+
 Filling a (fllat) PDF form with data from a CSV file in R
 
 
@@ -236,7 +237,7 @@ First of all, to keep track of pages used,  we have to add a page counter every 
 
 
 
-Here to overalay our text over we will use the open source  cross platform  [Apache PDFbox](http://pdfbox.apache.org) and particularly the java based [PDFBox Command Line Tools](http://pdfbox.apache.org/commandline/). Before starting make sure  that both [pdfbox-app](http://pdfbox.apache.org/downloads.html) and the single page form to be filled (`form.pdf`)are available from R working path. As an alternative, you may want to adjust the path occurring in the following code accordance with yours. For portability reason, we will run shell command via R, so we start initialiting PDFBox with:
+Here to overalay our text over we will use the open source  cross platform  [Apache PDFbox](http://pdfbox.apache.org) and particularly the java based [PDFBox Command Line Tools](http://pdfbox.apache.org/commandline/). Before starting make sure  that both [pdfbox-app](http://pdfbox.apache.org/downloads.html) and the single page form to be filled (`form.pdf`) are available from R working path. As an alternative, you may want to adjust the path occurring in the following code accordance with yours. For portability reason, we will run shell command via R, so we start initialiting PDFBox with:
 
     PDFBOX="java -jar pdfbox-app-1.8.2.jar"    #Modify this lines to match your system, version and path
     TEMP='temp.pdf'; FORM='form.pdf'; FILLED='form-filled.pdf'                  #... and your form files 
@@ -277,8 +278,7 @@ Final considerations
 
 To position your text properly on the PDF you may take advantage of the distance tools, present in many PDF applications, including some free ones.
 
-For example, under windows, [this image](http://i.imgur.com/IT4IOgc.png?1)
+For example, under windows, [this image](http://i.imgur.com/IT4IOgc.png?1) shows this tool using the free [PDF-XChange Viewer](http://www.tracker-software.com/product/pdf-xchange-viewer)
 
-shows this tool using the free [PDF-XChange Viewer](http://www.tracker-software.com/product/pdf-xchange-viewer)
 
 
