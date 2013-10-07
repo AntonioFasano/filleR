@@ -278,8 +278,7 @@ To position your text properly on the PDF you may take advantage of the distance
 For example, under Windows, [this image](http://i.imgur.com/IT4IOgc.png?1) shows a distance tool in action  using the free [PDF-XChange Viewer](http://www.tracker-software.com/product/pdf-xchange-viewer).
 
 
-
-<!-- replace with WP code style    -->
+<!-- Replace with WP code style    -->
 <!-- (query-replace-regexp  "<pre><code>"  "[code language=\"r\"]")  -->
 <!-- (query-replace-regexp  "</code></pre>"  "[/code]") -->
 <!-- Local Variables: -->
