@@ -279,7 +279,7 @@ For example, under Windows, [this image](http://i.imgur.com/IT4IOgc.png?1) shows
 
 
 
-<!-- replace with WP code style    -->
+
 <!-- (query-replace-regexp  "<pre><code>"  "[code language=\"r\"]")  -->
 <!-- (query-replace-regexp  "</code></pre>"  "[/code]") -->
 <!-- Local Variables: -->
