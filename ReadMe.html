@@ -1,0 +1,182 @@
+<h1 id="filler">filleR</h1>
+<p>Filling a (flat) PDF form with data from a CSV file in R</p>
+<h1 id="introduction">Introduction</h1>
+<p>Don't get me wrong I am a fan of <a href="http://yihui.name/knitr/">knitr</a> (and a former user of <a href="http://www.stat.uni-muenchen.de/~leisch/Sweave/">Sweave</a>), but there are situations when they might just not fit the purpose. Indeed, as LaTeX based tools, they lie on the principle that content is more important than presentation, or better presentation technicalities. The latter should not occupy the researchers' time and be delegated to a mostly predefined model.</p>
+<p>Anyway, chances there are that for some documents, the content is very silly, while you need a very detailed control over the final printed output, that is over the position of your printed material. One such a case is filling a form: you have to print words exactly in the blank spaces designed for them.</p>
+<p>One simple strategy for the you R user is printing the filling text on a PDF file, as you would for a plot, thereafter you overlay it on the PDF document to be filled. Note the here by PDF form to be filled I mean a 'flat' form, not the special file type hosting form fields.</p>
+<p>There are many free tools for overlaying PDFs: a cross platform open source example is Apache PDFBox in Java.</p>
+<p>In the following I will show how to read a data from a spreadsheet in CSV format and using them to fill a (many) PDF form(s).</p>
+<h1 id="writing-on-the-border-of-your-page">Writing on the border of your page</h1>
+<p>Saving a figure as a PDF is nothing new for you and most likely you know that you can write a blank plot with <code>plot.new()</code> and add text to it with <code>text()</code>. The problem is that R adds white spaces every here and there for aesthetic reasons; but, if you need to fill a form, you need to write your text exactly n inch from the borders and not n plus some offset. Obviously you have two alternatives: you adjust your text printing commands to take into account R blank offsets; you set all offsets to zero. The former is impractical also because the offset is in percent, so it is not a matter of simple subtracting a given delta. The latter is a bit tricky (at least, so appeared to me), but you do it once and for all.</p>
+<p>With the following code you will create <code>foo.pdf</code> in R current directory with <code>hello</code> written exactly on the left border of the page.</p>
+<p>Note that there are three places (in <code>par()</code> and <code>text()</code>) where we need to nullify the white space.</p>
+<pre><code>WIDTH=8.3; HEIGHT=11.7        #Paper size A4, measure  in inches
+
+pdf(&#39;foo.pdf&#39;, WIDTH, HEIGHT) #Write next plot to &#39;foo.pdf&#39;
+par(mar=c(0, 0, 0, 0))        #Set numbers of lateral blank lines to zero
+par(xaxs=&#39;i&#39;, yaxs=&#39;i&#39;)       #Does not extend axes by 4 percent for pretty labels
+
+plot.new()                    #Create a blank plot, where we will want to write our text
+plot.window(xlim=c(0,WIDTH), ylim=c(0,HEIGHT)) #Fit plot to paper size
+text(0, .5, &quot;hello&quot;, pos=4, offset=0)   #Write to the right of coords without default .5 offset
+
+dev.off()                     #Close device, that is saving for a PDF device</code></pre>
+<p>Change <code>WIDTH,  HEIGHT</code> above to your actual paper size.</p>
+<p>Since <code>text</code> will be used quite often, and we might want to change font and magnification, it is better to define a specialised print function:</p>
+<pre><code>###Print left aligned
+MAGNI=1    #Magnification factor
+FONT=1     #Font: 1 is Helvetica regular, 2 Helv. bold, ... 6 Times  
+ltext=function(x,y, s) text(x,y, s, pos=4, offset=0, cex=MAGNI, font=FONT)</code></pre>
+<p>Read the R manual for more on plot magnification factors and fonts and set them as you please.</p>
+<h1 id="reading-data-from-a-csv-file">Reading data from a CSV file</h1>
+<p>So we can now easily place text wherever in the page, let's take the data from a CSV file. The structure will be as follows:</p>
+<pre><code>x,y,text
+3,5,John
+3,4,Smith
+.....</code></pre>
+<p>If you think <code>x,y</code> are the coordinates and followed by the to print, you guessed it right.</p>
+<p>The new code, now reading the overlay material from the CSV data, is:</p>
+<pre><code>OVER=&#39;overlay.pdf&#39;; WIDTH=8.3; HEIGHT=11.7 #Overlay PDF path and size (inches)
+DATA=&#39;form.csv&#39;                            #CSV data source 
+
+pdf(OVER, WIDTH, HEIGHT) #Write next plot to the overlay PDF
+par(mar=c(0, 0, 0, 0))   #Set numbers of lateral blank lines to zero
+par(xaxs=&#39;i&#39;, yaxs=&#39;i&#39;)  #Does not extend axes by 4 percent for pretty labels
+
+plot.new()                                     #Create the blank plot to write to
+plot.window(xlim=c(0,WIDTH), ylim=c(0,HEIGHT)) #Fit plot to paper size
+d=read.csv(DATA, as.is=TRUE)                   #Read fill data
+ltext(d$x, d$y, d$text)                        #... and print
+
+dev.off()                                      #Save overlay PDF</code></pre>
+<h1 id="generating-a-multipage-pdf">Generating a multipage PDF</h1>
+<p>You may rightly think that this game makes sense if we have multiple forms to fill.</p>
+<p>The CSV could now look something like:</p>
+<pre><code>x,y,text
+3,5,John
+3,4,Smith
+.....
+-1
+3,5,Bob
+3,4,Sullivan</code></pre>
+<p>Yes, <code>-1</code> tells to skip to a new page. A spreadsheet might set this row as <code>-1,,</code>, but in R it is the same. You can use any number (but not a letter), as the code just checks that the second field is empty.</p>
+<pre><code>OVER=&#39;overlay.pdf&#39;; WIDTH=8.3; HEIGHT=11.7 #Overlay PDF path and size (inches)
+DATA=&#39;form.csv&#39;                            #CSV data source 
+
+pdf(OVER, WIDTH, HEIGHT) #Write next plot to the overlay PDF
+par(mar=c(0, 0, 0, 0))   #Set numbers of lateral blank lines to zero
+par(xaxs=&#39;i&#39;, yaxs=&#39;i&#39;)  #Does not extend axes by 4 percent for pretty labels
+
+plot.new()                                     #Create the blank plot to write to
+plot.window(xlim=c(0,WIDTH), ylim=c(0,HEIGHT)) #Fit plot to paper size
+
+d=read.csv(DATA, as.is=TRUE)                   #Read and print fill data one row per time
+for (i in 1:nrow(d)) {
+  x=d[i,1]; y=d[i,2]; tx=d[i,3]
+  if(is.na(y)){                                #On -1 start a new plot/page
+    plot.new()
+    plot.window(xlim=c(0,WIDTH), ylim=c(0,HEIGHT))
+  }
+  ltext(x, y, tx)   
+}
+
+dev.off()                                      #Save overlay PDF</code></pre>
+<h1 id="adding-multiline-entries-with-automatic-left-justification">Adding multiline entries with automatic left justification</h1>
+<p>Another interesting thing could be to fill a multilne box. The idea is that in the CSV we set an optional <code>length</code> field, where we say how many characters the multiline text should be large. So, in the CSV the row for a multiline box would be like:</p>
+<pre><code>x,y,text,length
+3,4,&quot;Very long text to be split every n characters&quot;,10</code></pre>
+<p>Note the double quotes to mask commas, which often recur in long texts.</p>
+<p>To left justify a string with a given text width, we define:</p>
+<pre><code>###Left multiline justification at &#39;width&#39;
+justify=function(string, width){
+
+  str.len=nchar(string)
+  sp=gregexpr(&#39; &#39;, string)[[1]]                            #Get text spaces
+  l=seq(from=width, by=width, length=floor(str.len/width)) #Get limits for every row
+  bsp=sapply(l, function(x) max(sp[sp&lt;=x]))                #Breaking spaces
+  rows=substring (string, c(1, bsp), c(bsp, str.len))      #Extract lines
+  rows=sub(&quot;^ +&quot;, &quot;&quot;, rows)                                #Remove leading spaces 
+  paste(rows, &#39;\n&#39;, collapse=&#39;&#39;)                           #Merge rows, with newlines
+}</code></pre>
+<p>Integrating the previous code will bring too:</p>
+<pre><code>OVER=&#39;overlay.pdf&#39;; WIDTH=8.3; HEIGHT=11.7 #Overlay PDF path and size (inches)
+DATA=&#39;form.csv&#39;                            #CSV data source 
+
+pdf(OVER, WIDTH, HEIGHT) #Write next plot to the overlay PDF
+par(mar=c(0, 0, 0, 0))   #Set numbers of lateral blank lines to zero
+par(xaxs=&#39;i&#39;, yaxs=&#39;i&#39;)  #Does not extend axes by 4 percent for pretty labels
+
+plot.new()                                     #Create the blank plot to write to
+plot.window(xlim=c(0,WIDTH), ylim=c(0,HEIGHT)) #Fit plot to paper size
+
+d=read.csv(DATA, as.is=TRUE)                   #Read and print fill data one row per time
+for (i in 1:nrow(d)) {
+  x=d[i,1]; y=d[i,2]; tx=d[i,3]; text.width=d[i,4]
+
+  if(is.na(y)){                                     #On -1 start a new plot/page
+    plot.new()
+    plot.window(xlim=c(0,WIDTH), ylim=c(0,HEIGHT))
+  }
+
+  if(!is.na(text.width)) tx=justify(tx, text.width) #Justify left 
+  ltext(x, y, tx)   
+}
+
+dev.off()                                      #Save overlay PDF</code></pre>
+<h1 id="overlay-the-text-over-the-form">Overlay the text over the form</h1>
+<p>To finalize our project we need to print on the form, that is to overlay the generated PDF over the original form.</p>
+<p>To make a real world example I will use a book I have to fill for tracking my lectures.</p>
+<p>The template for the CSV data to print is as follows:</p>
+<pre><code>x,y,text,length
+*,*,Lecture Day/Month 
+*,*,Lecture Start time 
+*,*,Lecture End time
+*,*,Lecture Description,15
+... 4 like this per page
+-1
+... start again</code></pre>
+<p>For a usable 2 pages CSV see <a href="https://github.com/AntonioFasano/filleR/blob/master/form.csv">here</a>.</p>
+<p>Here is the form <a href="https://github.com/AntonioFasano/filleR/blob/master/form.pdf">before</a> and <a href="https://github.com/AntonioFasano/filleR/blob/master/form-filled.pdf">after</a> filling (unfortunately not in English).</p>
+<p>First of all, to keep track of pages used, we have to add a page counter every time we call <code>plot.new</code>. So it could be a good idea to define a new-page function:</p>
+<pre><code>PAGE.COUNT=0
+....
+###Create a new overlay page and update the page counter 
+new.page=function(page.width, page.height){
+    plot.new()               #Create a blank plot, as we just want to write our text
+    plot.window(xlim=c(0,page.width), ylim=c(0,page.height)) #Fit plot to paper size
+    PAGE.COUNT&lt;&lt;-PAGE.COUNT+1
+} </code></pre>
+<p>Here to overlay our text over we will use the open source and cross platform <a href="http://pdfbox.apache.org">Apache PDFbox</a> and particularly the java based <a href="http://pdfbox.apache.org/commandline/">PDFBox Command Line Tools</a>. Before starting make sure that both <a href="http://pdfbox.apache.org/downloads.html">pdfbox-app</a> and the single page form to be filled (<code>form.pdf</code>) are available from the R working path. As an alternative, you may want to adjust the path occurring in the following code in accordance to yours. For portability reason, we will run the PDFBox shell commands via R.</p>
+<p>We start initialising PDFBox and related variables:</p>
+<pre><code>PDFBOX=&quot;java -jar pdfbox-app-1.8.2.jar&quot;    #Modify this lines to match your system, version and path
+TEMP=&#39;temp.pdf&#39;; FORM=&#39;form.pdf&#39;; FILLED=&#39;form-filled.pdf&#39;                  #... and your form files </code></pre>
+<p>We now create a temporary PDF replicating the single-page form for the number of overlay pages using the <a href="http://pdfbox.apache.org/commandline/">PDFMerger</a> command, the synopsis is:</p>
+<pre><code>java -jar pdfbox-app-x.y.z.jar PDFMerger &lt;Source PDF files (2 ..n)&gt; &lt;Target PDF file&gt;</code></pre>
+<p>So we run:</p>
+<pre><code>cmd=paste(rep(FORM, PAGE.COUNT), collapse=&#39; &#39;)
+cmd=paste(PDFBOX,  &quot;PDFMerger&quot;,  cmd, TEMP)
+try(system(cmd, intern = TRUE))</code></pre>
+<p>We can now overlay the overlay PDF on the temporary PDF by means the homonymous command <a href="http://pdfbox.apache.org/commandline/">Overlay</a>:</p>
+<pre><code>java -jar pdfbox-app-x.y.z.jar Overlay &lt;overlay.pdf&gt; &lt;document.pdf&gt; &lt;result.pdf&gt;</code></pre>
+<p>That is:</p>
+<pre><code>cmd=paste(PDFBOX, &quot;Overlay&quot;, OVER, TEMP, FILLED)
+try(system(cmd, intern = TRUE))</code></pre>
+<p>Some optional bells and whistles with <a href="http://pdfbox.apache.org/commandline/">PDFReader</a>:</p>
+<pre><code>cmd=paste(PDFBOX, &quot;PDFReader&quot;, FILLED)
+try(system(cmd, intern = TRUE))</code></pre>
+<p>Read the full code on github <a href="https://github.com/AntonioFasano/filleR/blob/master/filleR.r">FilleR</a>.</p>
+<h1 id="final-considerations">Final considerations</h1>
+<p>To position your text properly on the PDF you may take advantage of the distance tools present in many PDF applications, including some free ones.</p>
+<p>For example, under Windows, <a href="http://i.imgur.com/IT4IOgc.png?1">this image</a> shows a distance tool in action using the free <a href="http://www.tracker-software.com/product/pdf-xchange-viewer">PDF-XChange Viewer</a>.</p>
+<!-- (query-replace-regexp  "<pre><code>"  "[code language=\"r\"]")  -->
+<!-- (query-replace-regexp  "</code></pre>"  "[/code]") -->
+<!-- Local Variables: -->
+<!-- mode: markdown -->
+<!-- mode: visual-line -->
+<!-- End: -->
+<!-- Local IspellDict: english -->
+<!--  LocalWords:  knitr Sweave PDF PDFs PDFBox CSV filleR homonymous
+ -->
+
+
+

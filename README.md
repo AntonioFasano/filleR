@@ -260,7 +260,7 @@ That is:
     cmd=paste(PDFBOX, "Overlay", OVER, TEMP, FILLED)
     try(system(cmd, intern = TRUE))
 
-Some optional bells and whistles with [PDFReader]((http://pdfbox.apache.org/commandline/):
+Some optional bells and whistles with [PDFReader](http://pdfbox.apache.org/commandline/):
 
     cmd=paste(PDFBOX, "PDFReader", FILLED)
     try(system(cmd, intern = TRUE))
@@ -280,7 +280,8 @@ For example, under Windows, [this image](http://i.imgur.com/IT4IOgc.png?1) shows
 
 
 
-
+<!-- (query-replace-regexp  "<pre><code>"  "[code language=\"r\"]")  -->
+<!-- (query-replace-regexp  "</code></pre>"  "[/code]") -->
 <!-- Local Variables: -->
 <!-- mode: markdown -->
 <!-- mode: visual-line -->
