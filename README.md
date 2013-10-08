@@ -40,7 +40,7 @@ Note that there are three places (in `par()` and `text()`) where we need to null
 
     plot.new()                    #Create a blank plot, where we will want to write our text
     plot.window(xlim=c(0,WIDTH), ylim=c(0,HEIGHT)) #Fit plot to paper size
-    text(0, .5, "hello", pos=4, offset=0)   #Write to the right of coords without default .5 offset
+    text(0, .5, 'hello', pos=4, offset=0)   #Write to the right of coords without default .5 offset
 	
     dev.off()                     #Close device, that is saving for a PDF device
 
@@ -156,7 +156,7 @@ To left justify a string with a given text width, we define:
       l=seq(from=width, by=width, length=floor(str.len/width)) #Get limits for every row
       bsp=sapply(l, function(x) max(sp[sp<=x]))                #Breaking spaces
       rows=substring (string, c(1, bsp), c(bsp, str.len))      #Extract lines
-      rows=sub("^ +", "", rows)                                #Remove leading spaces 
+      rows=sub('^ +', '', rows)                                #Remove leading spaces 
       paste(rows, '\n', collapse='')                           #Merge rows, with newlines
     }
 
@@ -235,7 +235,7 @@ Here to overlay our text over we will use the open source  and cross platform  [
 
 We start initialising PDFBox and related variables:
 
-    PDFBOX="java -jar pdfbox-app-1.8.2.jar"    #Modify this lines to match your system, version and path
+    PDFBOX='java -jar pdfbox-app-1.8.2.jar'    #Modify this lines to match your system, version and path
     TEMP='temp.pdf'; FORM='form.pdf'; FILLED='form-filled.pdf'                  #... and your form files 
  
 
@@ -247,7 +247,7 @@ We now create a temporary PDF  replicating the single-page form for the number o
 So we run:
 
     cmd=paste(rep(FORM, PAGE.COUNT), collapse=' ')
-    cmd=paste(PDFBOX,  "PDFMerger",  cmd, TEMP)
+    cmd=paste(PDFBOX,  'PDFMerger',  cmd, TEMP)
     try(system(cmd, intern = TRUE))
 
 
@@ -257,12 +257,12 @@ We can now overlay the overlay PDF on the temporary PDF  by means  the homonymou
 	
 That is:
 
-    cmd=paste(PDFBOX, "Overlay", OVER, TEMP, FILLED)
+    cmd=paste(PDFBOX, 'Overlay', OVER, TEMP, FILLED)
     try(system(cmd, intern = TRUE))
 
 Some optional bells and whistles with [PDFReader](http://pdfbox.apache.org/commandline/):
 
-    cmd=paste(PDFBOX, "PDFReader", FILLED)
+    cmd=paste(PDFBOX, 'PDFReader', FILLED)
     try(system(cmd, intern = TRUE))
 
 
@@ -281,6 +281,9 @@ For example, under Windows, [this image](http://i.imgur.com/IT4IOgc.png?1) shows
 <!-- Replace with WP code style    -->
 <!-- (query-replace-regexp  "<pre><code>"  "[code language=\"r\"]")  -->
 <!-- (query-replace-regexp  "</code></pre>"  "[/code]") -->
+<!-- (query-replace-regexp  "&quot;"  "\"") -->
+<!-- (query-replace-regexp  "&lt;"  "<") -->
+<!-- (query-replace-regexp  "&gt;"  ">") -->
 <!-- Local Variables: -->
 <!-- mode: markdown -->
 <!-- mode: visual-line -->

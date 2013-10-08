@@ -18,7 +18,7 @@ par(xaxs=&#39;i&#39;, yaxs=&#39;i&#39;)       #Does not extend axes by 4 percent
 
 plot.new()                    #Create a blank plot, where we will want to write our text
 plot.window(xlim=c(0,WIDTH), ylim=c(0,HEIGHT)) #Fit plot to paper size
-text(0, .5, &quot;hello&quot;, pos=4, offset=0)   #Write to the right of coords without default .5 offset
+text(0, .5, &#39;hello&#39;, pos=4, offset=0)   #Write to the right of coords without default .5 offset
 
 dev.off()                     #Close device, that is saving for a PDF device</code></pre>
 <p>Change <code>WIDTH,  HEIGHT</code> above to your actual paper size.</p>
@@ -95,7 +95,7 @@ justify=function(string, width){
   l=seq(from=width, by=width, length=floor(str.len/width)) #Get limits for every row
   bsp=sapply(l, function(x) max(sp[sp&lt;=x]))                #Breaking spaces
   rows=substring (string, c(1, bsp), c(bsp, str.len))      #Extract lines
-  rows=sub(&quot;^ +&quot;, &quot;&quot;, rows)                                #Remove leading spaces 
+  rows=sub(&#39;^ +&#39;, &#39;&#39;, rows)                                #Remove leading spaces 
   paste(rows, &#39;\n&#39;, collapse=&#39;&#39;)                           #Merge rows, with newlines
 }</code></pre>
 <p>Integrating the previous code will bring too:</p>
@@ -148,21 +148,21 @@ new.page=function(page.width, page.height){
 } </code></pre>
 <p>Here to overlay our text over we will use the open source and cross platform <a href="http://pdfbox.apache.org">Apache PDFbox</a> and particularly the java based <a href="http://pdfbox.apache.org/commandline/">PDFBox Command Line Tools</a>. Before starting make sure that both <a href="http://pdfbox.apache.org/downloads.html">pdfbox-app</a> and the single page form to be filled (<code>form.pdf</code>) are available from the R working path. As an alternative, you may want to adjust the path occurring in the following code in accordance to yours. For portability reason, we will run the PDFBox shell commands via R.</p>
 <p>We start initialising PDFBox and related variables:</p>
-<pre><code>PDFBOX=&quot;java -jar pdfbox-app-1.8.2.jar&quot;    #Modify this lines to match your system, version and path
+<pre><code>PDFBOX=&#39;java -jar pdfbox-app-1.8.2.jar&#39;    #Modify this lines to match your system, version and path
 TEMP=&#39;temp.pdf&#39;; FORM=&#39;form.pdf&#39;; FILLED=&#39;form-filled.pdf&#39;                  #... and your form files </code></pre>
 <p>We now create a temporary PDF replicating the single-page form for the number of overlay pages using the <a href="http://pdfbox.apache.org/commandline/">PDFMerger</a> command, the synopsis is:</p>
 <pre><code>java -jar pdfbox-app-x.y.z.jar PDFMerger &lt;Source PDF files (2 ..n)&gt; &lt;Target PDF file&gt;</code></pre>
 <p>So we run:</p>
 <pre><code>cmd=paste(rep(FORM, PAGE.COUNT), collapse=&#39; &#39;)
-cmd=paste(PDFBOX,  &quot;PDFMerger&quot;,  cmd, TEMP)
+cmd=paste(PDFBOX,  &#39;PDFMerger&#39;,  cmd, TEMP)
 try(system(cmd, intern = TRUE))</code></pre>
 <p>We can now overlay the overlay PDF on the temporary PDF by means the homonymous command <a href="http://pdfbox.apache.org/commandline/">Overlay</a>:</p>
 <pre><code>java -jar pdfbox-app-x.y.z.jar Overlay &lt;overlay.pdf&gt; &lt;document.pdf&gt; &lt;result.pdf&gt;</code></pre>
 <p>That is:</p>
-<pre><code>cmd=paste(PDFBOX, &quot;Overlay&quot;, OVER, TEMP, FILLED)
+<pre><code>cmd=paste(PDFBOX, &#39;Overlay&#39;, OVER, TEMP, FILLED)
 try(system(cmd, intern = TRUE))</code></pre>
 <p>Some optional bells and whistles with <a href="http://pdfbox.apache.org/commandline/">PDFReader</a>:</p>
-<pre><code>cmd=paste(PDFBOX, &quot;PDFReader&quot;, FILLED)
+<pre><code>cmd=paste(PDFBOX, &#39;PDFReader&#39;, FILLED)
 try(system(cmd, intern = TRUE))</code></pre>
 <p>Read the full code on github <a href="https://github.com/AntonioFasano/filleR/blob/master/filleR.r">FilleR</a>.</p>
 <h1 id="final-considerations">Final considerations</h1>
@@ -171,6 +171,9 @@ try(system(cmd, intern = TRUE))</code></pre>
 <!-- Replace with WP code style    -->
 <!-- (query-replace-regexp  "<pre><code>"  "[code language=\"r\"]")  -->
 <!-- (query-replace-regexp  "</code></pre>"  "[/code]") -->
+<!-- (query-replace-regexp  "&quot;"  "\"") -->
+<!-- (query-replace-regexp  "&lt;"  "<") -->
+<!-- (query-replace-regexp  "&gt;"  ">") -->
 <!-- Local Variables: -->
 <!-- mode: markdown -->
 <!-- mode: visual-line -->
