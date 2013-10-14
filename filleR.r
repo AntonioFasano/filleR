@@ -1,30 +1,31 @@
 ##################################################################################
-# main()  #Where necessary customise the vars, and run main()
+# makePdf()  #Where necessary customise the vars, and run makePdf()
 
-CURR.DIR='.'                               #Main file directory
-OVER='overlay.pdf'; WIDTH=8.3; HEIGHT=11.7 #Overlay PDF path and size (inches)
-DATA='form.csv'; TEMP='temp.pdf'           #CSV data source and temp output
-FORM='form.pdf'; FILLED='form-filled.pdf'  #Un/filled form
+CURR.DIR='.'                               #File directory
+FORM='form.pdf'; WIDTH=8.3; HEIGHT=11.7    #Input form to be filled, single page. Size in inches
+PDFDATA='form.csv';                           #CSV data source 
+FILLED='form-filled.pdf'                   #The output filled form
 PDFBOX="java -jar pdfbox-app-1.8.2.jar"    #pdfbox-app-x.y.z.jar version/path.
-MAGNI=0.7                                  #Magnification factor
+MAGNI=0.7                                  #Text magnification factor
 FONT=1                                     #Font: 1 helvetica regular, 2 Helv. bold, ... 6 Times  
+TEMP1='temp1.pdf'                          #Text PDF to be overlayed on the form
+TEMP2='temp2.pdf'                          #Multipage version of the form
 #####################################################################################
 PAGE.COUNT=0                               #Total pages counter, do not modify
 
 
 
-
-main=function(){
+makePdf=function(){
 
   setwd(CURR.DIR)
   PAGE.COUNT<<-0
 
-  pdf(OVER, WIDTH, HEIGHT)        #Write next plot to the overlay PDF
+  pdf(TEMP1, WIDTH, HEIGHT)       #Write next plot to the overlay PDF
   par(mar=c(0, 0, 0, 0))          #Set numbers of lateral blank lines to zero
   par(xaxs='i', yaxs='i')         #Does not extend axes by 4 percent for pretty labels
   new.page(WIDTH, HEIGHT)         #Create a new page 
    
-  d=read.csv(DATA, as.is=TRUE)    #Read and print fill data one row per time
+  d=read.csv(PDFDATA, as.is=TRUE)    #Read and print fill data one row per time
   for (i in 1:nrow(d)) {
     x=d[i,1]; y=d[i,2]; tx=d[i,3]; text.width=d[i,4]
    
@@ -32,8 +33,9 @@ main=function(){
     if(!is.na(text.width)) tx=justify(tx, text.width) #Justify left 
     ltext(x, y, tx)	
   }
-   
+  
   dev.off()                                           #Save overlay PDF
+   
 
 
      
@@ -41,14 +43,14 @@ main=function(){
   temp=FORM
   if(PAGE.COUNT>1){
     cmd=paste(rep(FORM, PAGE.COUNT), collapse=' ')
-    cmd=paste(PDFBOX,  "PDFMerger",  cmd, TEMP)
+    cmd=paste(PDFBOX,  "PDFMerger",  cmd, TEMP2)
     try(system(cmd, intern = TRUE))
-    temp=TEMP
+    temp=TEMP2
   }
   
 
-  ###Overlay OVER over TEMP
-  (cmd=paste(PDFBOX, "Overlay", OVER, temp, FILLED))
+  ###Overlay TEMP1 over TEMP2
+  (cmd=paste(PDFBOX, "Overlay", TEMP1, temp, FILLED))
   try(system(cmd, intern = TRUE))
    
   ###Kindly show the results
