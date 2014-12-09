@@ -1,35 +1,43 @@
 ##################################################################################
 # makePdf()  #Where necessary customise the vars, and run makePdf()
 
-CURR.DIR='.'                               #File directory
-FORM='form.pdf'; WIDTH=8.3; HEIGHT=11.7    #Input form to be filled, single page. Size in inches
-PDFDATA='form.csv';                           #CSV data source 
-FILLED='form-filled.pdf'                   #The output filled form
-PDFBOX="java -jar pdfbox-app-1.8.2.jar"    #pdfbox-app-x.y.z.jar version/path.
+#CURR.DIR='.'                               #File directory
+PDFBOX="java -jar pdfbox-app-1.8.7.jar"    #pdfbox-app-x.y.z.jar version/path.
 MAGNI=0.7                                  #Text magnification factor
 FONT=1                                     #Font: 1 helvetica regular, 2 Helv. bold, ... 6 Times  
-TEMP1='temp1.pdf'                          #Text PDF to be overlayed on the form
-TEMP2='temp2.pdf'                          #Multipage version of the form
+temp1='temp1.pdf'                          #Text PDF to be overlayed on the form
+temp2='temp2.pdf'                          #Multipage version of the form
 #####################################################################################
 PAGE.COUNT=0                               #Total pages counter, do not modify
 
 
+## makePdf("form.pdf", "form.csv", "form-filled.pdf")
+makePdf=function(
+    form,                  #Input form to be filled (single page)
+    PDFDATA ,              #CSV data source 
+    FILLED ,               #The output filled form
+    width=8.3, height=11.7 #Input form size in inches
+    ){
 
-makePdf=function(){
-
-  setwd(CURR.DIR)
+#  setwd(CURR.DIR)
   PAGE.COUNT<<-0
 
-  pdf(TEMP1, WIDTH, HEIGHT)       #Write next plot to the overlay PDF
-  par(mar=c(0, 0, 0, 0))          #Set numbers of lateral blank lines to zero
-  par(xaxs='i', yaxs='i')         #Does not extend axes by 4 percent for pretty labels
-  new.page(WIDTH, HEIGHT)         #Create a new page 
+  ## temp files
+  bpath=sub("(.+)\\..*", "\\1", FILLED)  
+  temp1=paste0(bpath, '.temp1.pdf')
+  temp2=paste0(bpath, '.temp2.pdf')
+
+  
+  pdf(temp1, width, height)     #Write next plot to the overlay PDF
+  par(mar=c(0, 0, 0, 0))        #Set numbers of lateral blank lines to zero
+  par(xaxs='i', yaxs='i')       #Does not extend axes by 4 percent for pretty labels
+  new.page(width, height)       #Create a new page 
    
   d=read.csv(PDFDATA, as.is=TRUE)    #Read and print fill data one row per time
   for (i in 1:nrow(d)) {
     x=d[i,1]; y=d[i,2]; tx=d[i,3]; text.width=d[i,4]
    
-    if(is.na(y)) new.page(WIDTH, HEIGHT)              #New page on -1 rows
+    if(is.na(y)) new.page(width, height)              #New page on -1 rows
     if(!is.na(text.width)) tx=justify(tx, text.width) #Justify left 
     ltext(x, y, tx)	
   }
@@ -39,18 +47,18 @@ makePdf=function(){
 
 
      
-  ###Replicate PAGE.COUNT-times the single page FORM
-  temp=FORM
+  ###Replicate PAGE.COUNT-times the single page form
+  temp=form
   if(PAGE.COUNT>1){
-    cmd=paste(rep(FORM, PAGE.COUNT), collapse=' ')
-    cmd=paste(PDFBOX,  "PDFMerger",  cmd, TEMP2)
+    cmd=paste(rep(form, PAGE.COUNT), collapse=' ')
+    cmd=paste(PDFBOX,  "PDFMerger",  cmd, temp2)
     try(system(cmd, intern = TRUE))
-    temp=TEMP2
+    temp=temp2
   }
   
 
-  ###Overlay TEMP1 over TEMP2
-  (cmd=paste(PDFBOX, "Overlay", TEMP1, temp, FILLED))
+  ###Overlay temp1 over temp2
+  (cmd=paste(PDFBOX, "Overlay", temp1, temp, FILLED))
   try(system(cmd, intern = TRUE))
    
   ###Kindly show the results
