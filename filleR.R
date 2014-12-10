@@ -2,30 +2,40 @@
 # makePdf()  #Where necessary customise the vars, and run makePdf()
 
 #CURR.DIR='.'                               #File directory
-PDFBOX="java -jar pdfbox-app-1.8.7.jar"    #pdfbox-app-x.y.z.jar version/path.
+PDFBOX="pdfbox-app-1.8.7.jar"    #pdfbox-app-x.y.z.jar version/path.
 MAGNI=0.7                                  #Text magnification factor
 FONT=1                                     #Font: 1 helvetica regular, 2 Helv. bold, ... 6 Times  
-temp1='temp1.pdf'                          #Text PDF to be overlayed on the form
-temp2='temp2.pdf'                          #Multipage version of the form
-#####################################################################################
+####################################################################################
 PAGE.COUNT=0                               #Total pages counter, do not modify
 
 
-## makePdf("form.pdf", "form.csv", "form-filled.pdf")
+
+
+## Make PDFBOX java cmd template
+x=rev(grep("source", sys.calls()))[1] # Get last source call
+x=sys.call(x)[[2]]                    # Extract path
+script.dir=dirname(x)
+PDFBOX= paste0(script.dir, "/", PDFBOX)
+if(!file.exists(PDFBOX)) stop("Can't find", PDFBOX)
+PDFBOX= dQuote(PDFBOX)
+PDFBOX= paste0("java -jar ", PDFBOX)
+
+
+## makePdf("form.tpl.pdf", "form.csv", "form-filled.pdf")
 makePdf=function(
-    form,                  #Input form to be filled (single page)
-    PDFDATA ,              #CSV data source 
-    FILLED ,               #The output filled form
+    form.tpl,              #Input form to be filled (single page)
+    pdfdata.csv,           #CSV data source 
+    filled.form,           #The output filled form
     width=8.3, height=11.7 #Input form size in inches
     ){
 
-#  setwd(CURR.DIR)
+
   PAGE.COUNT<<-0
 
   ## temp files
-  bpath=sub("(.+)\\..*", "\\1", FILLED)  
-  temp1=paste0(bpath, '.temp1.pdf')
-  temp2=paste0(bpath, '.temp2.pdf')
+  bpath=sub("(.+)\\..*", "\\1", filled.form)  
+  temp1=paste0(bpath, '.temp1.pdf')  #Text PDF to be overlayed on the form  
+  temp2=paste0(bpath, '.temp2.pdf')  #Multipage version of the form template         
 
   
   pdf(temp1, width, height)     #Write next plot to the overlay PDF
@@ -33,7 +43,7 @@ makePdf=function(
   par(xaxs='i', yaxs='i')       #Does not extend axes by 4 percent for pretty labels
   new.page(width, height)       #Create a new page 
    
-  d=read.csv(PDFDATA, as.is=TRUE)    #Read and print fill data one row per time
+  d=read.csv(pdfdata.csv, as.is=TRUE)    #Read and print fill data one row per time
   for (i in 1:nrow(d)) {
     x=d[i,1]; y=d[i,2]; tx=d[i,3]; text.width=d[i,4]
    
@@ -47,22 +57,22 @@ makePdf=function(
 
 
      
-  ###Replicate PAGE.COUNT-times the single page form
-  temp=form
+  ###Replicate PAGE.COUNT-times the single page form template
+  temp=form.tpl
   if(PAGE.COUNT>1){
-    cmd=paste(rep(form, PAGE.COUNT), collapse=' ')
-    cmd=paste(PDFBOX,  "PDFMerger",  cmd, temp2)
+    cmd=paste(rep(dQuote(form.tpl), PAGE.COUNT), collapse=' ')
+    cmd=paste(PDFBOX,  "PDFMerger",  cmd, dQuote(temp2))
     try(system(cmd, intern = TRUE))
     temp=temp2
   }
   
 
   ###Overlay temp1 over temp2
-  (cmd=paste(PDFBOX, "Overlay", temp1, temp, FILLED))
+  (cmd=paste(PDFBOX, "Overlay", dQuote(temp1), dQuote(temp), dQuote(filled.form)))
   try(system(cmd, intern = TRUE))
    
   ###Kindly show the results
-  cmd=paste(PDFBOX,  "PDFReader", FILLED)
+  cmd=paste(PDFBOX,  "PDFReader", dQuote(filled.form))
   #try(system(cmd))
 
 }
