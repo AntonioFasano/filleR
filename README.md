@@ -64,7 +64,7 @@ To generate the filled PDF.
 
 Put in the same directory `form.pdf`, `form.csv`, the  [filleR.R script](https://github.com/AntonioFasano/filleR/blob/master/filleR.r), [pdfbox-app-1.8.7.jar](https://pdfbox.apache.org/download.cgi). 
 
-Note: If you use a more recent version of pdfbox-app, adjust accordingly the line `filler.R`:
+Note: If you use a more recent version of pdfbox-app, adjust accordingly the `filler.R` line:
 
     PDFBOX="pdfbox-app-1.8.7.jar"
 
@@ -76,6 +76,10 @@ To get the filled PDF,  run in R:
 
 Depending on `getwd()`, adjust "path/to/filleR.R" and you should get the output PDF `filled.pdf`.
 
+
+Note: if the Java binary is not in your path, add its directory with:
+
+	Sys.setenv(PATH = paste(Sys.getenv("PATH"), "path\to\java\binary-dir", sep=.Platform$path.sep))
 
 If your `form.pdf` is not A4, use:
 

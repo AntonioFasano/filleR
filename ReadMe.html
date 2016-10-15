@@ -29,12 +29,14 @@ Lines like <code>x,y,text,length</code> are justified by splitting them in a new
 <code>-1,,,</code> stands for a page break, therefore a new page like <code>form.pdf</code>is added to the PDF file and the following lines will be printed on it.</p>
 <p>To generate the filled PDF.</p>
 <p>Put in the same directory <code>form.pdf</code>, <code>form.csv</code>, the <a href="https://github.com/AntonioFasano/filleR/blob/master/filleR.r">filleR.R script</a>, <a href="https://pdfbox.apache.org/download.cgi">pdfbox-app-1.8.7.jar</a>.</p>
-<p>Note: If you use a more recent version of pdfbox-app, adjust accordingly the line <code>filler.R</code>:</p>
+<p>Note: If you use a more recent version of pdfbox-app, adjust accordingly the <code>filler.R</code> line:</p>
 <pre><code>PDFBOX=&quot;pdfbox-app-1.8.7.jar&quot;</code></pre>
 <p>To get the filled PDF, run in R:</p>
 <pre><code>source(&quot;path/to/filleR.R&quot;)
 makePdf(&quot;form.pdf&quot;, &quot;form.csv&quot;, &quot;filled.pdf&quot;)</code></pre>
 <p>Depending on <code>getwd()</code>, adjust &quot;path/to/filleR.R&quot; and you should get the output PDF <code>filled.pdf</code>.</p>
+<p>Note: if the Java binary is not in your path, add its directory with:</p>
+<pre><code>Sys.setenv(PATH = paste(Sys.getenv(&quot;PATH&quot;), &quot;path\to\java\binary-dir&quot;, sep=.Platform$path.sep))</code></pre>
 <p>If your <code>form.pdf</code> is not A4, use:</p>
 <pre><code>makePdf(&quot;form.pdf&quot;, &quot;form.csv&quot;, &quot;filled.pdf&quot;, width=X, height=Y) </code></pre>
 <p>Replace<code>X</code> and <code>Y</code> with the page width and height in inches.</p>
