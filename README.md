@@ -79,7 +79,7 @@ Depending on `getwd()`, adjust "path/to/filleR.R" and you should get the output 
 
 Note: if the Java binary is not in your path, add its directory with:
 
-	Sys.setenv(PATH = paste(Sys.getenv("PATH"), "path\to\java\binary-dir", sep=.Platform$path.sep))
+	Sys.setenv(PATH = paste(Sys.getenv("PATH"), "path\\to\\java\\binary-dir", sep=.Platform$path.sep))
 
 If your `form.pdf` is not A4, use:
 

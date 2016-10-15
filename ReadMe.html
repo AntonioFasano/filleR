@@ -36,7 +36,7 @@ Lines like <code>x,y,text,length</code> are justified by splitting them in a new
 makePdf(&quot;form.pdf&quot;, &quot;form.csv&quot;, &quot;filled.pdf&quot;)</code></pre>
 <p>Depending on <code>getwd()</code>, adjust &quot;path/to/filleR.R&quot; and you should get the output PDF <code>filled.pdf</code>.</p>
 <p>Note: if the Java binary is not in your path, add its directory with:</p>
-<pre><code>Sys.setenv(PATH = paste(Sys.getenv(&quot;PATH&quot;), &quot;path\to\java\binary-dir&quot;, sep=.Platform$path.sep))</code></pre>
+<pre><code>Sys.setenv(PATH = paste(Sys.getenv(&quot;PATH&quot;), &quot;path\\to\\java\\binary-dir&quot;, sep=.Platform$path.sep))</code></pre>
 <p>If your <code>form.pdf</code> is not A4, use:</p>
 <pre><code>makePdf(&quot;form.pdf&quot;, &quot;form.csv&quot;, &quot;filled.pdf&quot;, width=X, height=Y) </code></pre>
 <p>Replace<code>X</code> and <code>Y</code> with the page width and height in inches.</p>
