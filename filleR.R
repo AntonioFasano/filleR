@@ -10,6 +10,7 @@ MAGNI=0.7     # Text magnification factor
 FONT=1        # Font: 1 helvetica regular, 2 Helv. bold, ... 6 Times  
 ####################################################################################
 
+## for git: makePdf: Test inputs, notemp opt
 
 
 ## Internal Globals -  Do not modify
@@ -104,20 +105,26 @@ search.java.exe=function(){
 
 ## makePdf("form.tpl.pdf", "form.csv", "form-filled.pdf")
 makePdf=function(
-    form.tpl,              # Input form to be filled (single page)
-    pdfdata.csv,           # CSV data source 
-    filled.form,           # The output filled form
-    cover=NULL,            # Cover PDF, if any
-    width=8.3, height=11.7 # Input form size in inches
+    form.tpl,               # Input form to be filled (single page)
+    pdfdata.csv,            # CSV data source 
+    filled.form,            # The output filled form
+    cover=NULL,             # Cover PDF, if any
+    width=8.3, height=11.7, # Input form size in inches
+    notemp=TRUE             # Remove temp files
     ){
+
+    PAGE.COUNT<<-0
 
     ## Get pdfbox
     JAVABIN=search.java.exe()
     PDFBOX=search.pdfbox.app()        
     PDFBOX= paste0(dQuote(JAVABIN), " -jar ", dQuote(PDFBOX))
 
+    ## Test inputs
+    if(!file.exists(form.tpl)) stop("Unable to find:\n  ", form.tpl)
+    if(!file.exists(pdfdata.csv)) stop("Unable to find:\n  ", pdfdata.csv)
+    if(!is.null(cover) && !file.exists(cover)) stop("Unable to find:\n  ", cover)
     
-    PAGE.COUNT<<-0
 
     ## Temp files
     bpath=sub("(.+)\\..*", "\\1", filled.form)  
@@ -164,6 +171,10 @@ makePdf=function(
         (cmd=paste(PDFBOX, "PDFMerger", dQuote(cover), dQuote(temp.nocov), dQuote(filled.form)))
         try(system(cmd, intern = TRUE))
     } 
+
+
+    ## Remove temp files
+    if(notemp) unlink(c(temp.nocov, temp1, temp2))  
     
     ## Kindly show the results
     cmd=paste(PDFBOX,  "PDFReader", dQuote(filled.form))
