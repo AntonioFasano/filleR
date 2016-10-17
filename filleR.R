@@ -10,7 +10,6 @@ MAGNI=0.7     # Text magnification factor
 FONT=1        # Font: 1 helvetica regular, 2 Helv. bold, ... 6 Times  
 ####################################################################################
 
-## For git: FILLERDIR works with ESS C-c C-l; search.pdfbox.app(); search.java.exe()
 
 
 ## Internal Globals -  Do not modify
