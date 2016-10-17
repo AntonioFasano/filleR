@@ -10,7 +10,6 @@ MAGNI=0.7     # Text magnification factor
 FONT=1        # Font: 1 helvetica regular, 2 Helv. bold, ... 6 Times  
 ####################################################################################
 
-## for git: makePdf: Test inputs, notemp opt
 
 
 ## Internal Globals -  Do not modify
