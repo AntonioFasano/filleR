@@ -2,23 +2,105 @@
 # makePdf()  #Where necessary customise the vars, and run makePdf()
 
 #CURR.DIR='.'                               #File directory
-PDFBOX="pdfbox-app-1.8.7.jar"    #pdfbox-app-x.y.z.jar version/path.
-MAGNI=0.7                                  #Text magnification factor
-FONT=1                                     #Font: 1 helvetica regular, 2 Helv. bold, ... 6 Times  
+PDFBOX=NULL   # Unless user sets path/to/pdfbox-app-x.y.z.jar,
+	      # search pdfbox-app with search.pdfbox.app()
+JAVABIN=NULL  # Unless user sets path/to/java (.exe),
+	      # search Java executable with search.java.exe()
+MAGNI=0.7     # Text magnification factor
+FONT=1        # Font: 1 helvetica regular, 2 Helv. bold, ... 6 Times  
 ####################################################################################
-PAGE.COUNT=0                               #Total pages counter, do not modify
+
+## For git: FILLERDIR works with ESS C-c C-l; search.pdfbox.app(); search.java.exe()
+
+
+## Internal Globals -  Do not modify
+FILLERDIR=NULL   # Script dir
+PAGE.COUNT=0     # Total pages counter
 
 
 
+## filleR invoked with standard source("path/to/filleR.R") 
+FILLERDIR=sys.frame(1)$ofile
+    
+## filleR invoked with Emacs ESS "ess-load-file" or "C-c C-l"
+if(is.null(FILLERDIR)) FILLERDIR=local({
+    x=grep(".ess.source", sys.calls())[1]
+    sys.call(x)[[2]]
+})
+    
+## Get script directory  
+if(!is.null(FILLERDIR)){
+    FILLERDIR=normalizePath(dirname(FILLERDIR)) 
+} else {
+    stop("Unable to find script source. Please invoke with:\n  source(\"path/to/filleR.R\")")
+}
 
-## Make PDFBOX java cmd template
-x=rev(grep("source", sys.calls()))[1] # Get last source call
-x=sys.call(x)[[2]]                    # Extract path
-script.dir=dirname(normalizePath(x))
-PDFBOX= paste0(script.dir, "/", PDFBOX)
-if(!file.exists(PDFBOX)) stop("Can't find", PDFBOX)
-PDFBOX= dQuote(PDFBOX)
-PDFBOX= paste0("java -jar ", PDFBOX)
+nzstring=function(s){ # Safe version of nzchar
+    ## TRUE if s is a non-NA and  non-zero char
+
+    if(is.character(s) &&
+       !is.na(s)       &&
+       nzchar(s))
+        TRUE else FALSE               
+}
+
+search.pdfbox.app=function(){
+    ## If PDFBOX is NULL, search for pdfbox-app-x.y.z.jar else test it is a valid path
+    ## Return absolute pdfbox-app path or stop with error 
+    ## pdfbox-app-x.y.z.jar is sought in a) current dir, b) script dir, 
+    ## c) in PATH env variable as pdfbox-app.jar (no version)
+     
+    if(!is.null(PDFBOX)) {        
+        if(!file.exists(PDFBOX)) stop("\nCan't find:\n  ", PDFBOX)
+    } else {
+  
+        p="^pdfbox-app.*\\.jar"
+        PDFBOX=rev(list.files(patt=p))[1]                           # search in current dir 
+        if(!nzstring(PDFBOX))                                       # search in script dir
+            PDFBOX=rev(list.files(path=FILLERDIR, patt=p, full=TRUE))[1]
+        
+        if(!nzstring(PDFBOX)) PDFBOX=Sys.which("pdfbox-app.jar")[1] # search in PATH
+  
+    }
+     
+    if(!nzstring(PDFBOX)) stop("\nCan't find pdfbox-app-x.y.z.jar") 
+    return(normalizePath(PDFBOX))
+     
+}
+
+
+search.java.exe=function(){
+    ## If JAVABIN is NULL, search for Java executable else test it is a valid path
+    ## Return absolute Java executable path or stop with error 
+    ## Java executable is sought a) through JAVA_HOME env variable, b) in PATH env variable
+
+    javahome=Sys.getenv("JAVA_HOME")
+   
+    if(!is.null(JAVABIN)) {         # Try JAVABIN global
+        if(!file.exists(JAVABIN)) stop("\nCan't find:\n  ", JAVABIN)
+        
+    } else if(nzstring(javahome)) {   # Try JAVA_HOME
+        if(!dir.exists(javahome))
+            stop("JAVA_HOME system variable is set to the non-existent path:\n ", javahome)
+    
+        javahome.bin=file.path(javahome, "bin")
+        if(!dir.exists(javahome.bin))
+            stop("Unable to find:\n  ", javahome.bin, "\nCheck JAVA_HOME system variable.")
+
+        JAVABIN=list.files(javahome.bin, "^java$|^java.exe$", full=TRUE)[1]
+        if(!nzstring(JAVABIN))
+            stop("\nCan't find:\n ", normalizePath(file.path(javahome.bin, "java"), mustWork=FALSE))
+        
+    } else { # Try PATH
+
+        JAVABIN=Sys.which("java")[1] 
+    }
+    
+    if(!nzstring(JAVABIN)) stop("\nCan't find Java executable") 
+    return(normalizePath(JAVABIN))
+     
+}
+
 
 
 ## makePdf("form.tpl.pdf", "form.csv", "form-filled.pdf")
@@ -30,7 +112,12 @@ makePdf=function(
     width=8.3, height=11.7 # Input form size in inches
     ){
 
+    ## Get pdfbox
+    JAVABIN=search.java.exe()
+    PDFBOX=search.pdfbox.app()        
+    PDFBOX= paste0(dQuote(JAVABIN), " -jar ", dQuote(PDFBOX))
 
+    
     PAGE.COUNT<<-0
 
     ## Temp files
@@ -81,7 +168,7 @@ makePdf=function(
     
     ## Kindly show the results
     cmd=paste(PDFBOX,  "PDFReader", dQuote(filled.form))
-                                        #try(system(cmd))
+    ##try(system(cmd))
 
 }
 

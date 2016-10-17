@@ -9,13 +9,12 @@ Filling a (flat) PDF form with data from a CSV file in R
 Motivation
 ============
 
-As you might know thanks to   [knitr](http://yihui.name/knitr/) package  it is possible to generate data driven reports in R. 
+As you might know thanks to  [knitr](http://yihui.name/knitr/) package it is possible to generate data driven reports in R. 
 
-Anyway there are situations when you already have a PDF template intended to be filled. 
-Instead of creating a new filled PDF from scratch, it might be better to use R just to duplicate the existing form template and write the filling data over the PDF forms.  
-Note the here by PDF form to be filled I mean a _flat_ form, not the special file type hosting form fields. 
+Anyway there are situations when you already have a PDF form intended to be filled and, instead of creating a new filled PDF from scratch, it might be better to use R just to write the filling data over (duplicates of) the existing PDF template.  
+This strategy is particularly useful when, for legal/administrative reasons, you are required to replicate exactly the original (complex) form. 
 
-This strategy is particularly useful when, for legal/administrative reasons, you are required to exactly  replicate exactly the original (complex) form. 
+Note: here by PDF form to be filled I mean a _flat_ form, not the special file type hosting form fields. 
 
 
 Requirements
@@ -23,16 +22,14 @@ Requirements
 
 Apart from R, you need  [Apache PDFBox](https://pdfbox.apache.org/) and a Java runtime environment.
 
-
-To position your text properly on the PDF you may take advantage of the _distance_ tools present in many PDF applications, including some free ones; unless  you may want to print your form and use a ruler or proceed by trail and error.
+Besides, to position your text properly on the PDF you may take advantage of the _distance_ tools present in many PDF applications, including some free ones; unless  you may want to print your form and use a ruler or proceed by trial and error.
 
 [this image](http://i.imgur.com/IT4IOgc.png?1) shows a distance tool in action  using the free [PDF-XChange Viewer](http://www.tracker-software.com/product/pdf-xchange-viewer).
-
 
 Among the free viewers for  Windows, you might consider [PDF-XChange Editor](https://www.tracker-software.com)  or [Foxit Reader](https://www.foxitsoftware.com).
 
 Usage
-======================
+======
 
 Let us assume that `form.pdf` is a one-page  A4 PDF representing the template to fill.
 
@@ -55,31 +52,23 @@ Create a `form.csv` file similar to the following:
 The first line is just a header, without actual content.    
 Lines like `x,y,text,` set the x-y coordinates in inches for placing the following `text` on a PDF page based on `form.pdf`, that is, `x`, `y` measure respectively the distance in inches from the left, bottom page border.   
 Lines like `x,y,text,length` are justified by splitting them in a new line every `length` characters.   
-`-1,,,` stands for a page break, therefore a new page like `form.pdf`is added to the PDF file and the following lines will be printed on it.
+`-1,,,` stands for a page break, therefore a new page like `form.pdf`is added to the PDF file and the following lines will be printed on it.   
+Note: CSV outmost commas are not really necessary. Therefore you can write `-1` for `-1,,,`.
 
+In order to generate the filled PDF, put in the same directory `form.pdf`, `form.csv`, the  [filleR.R script](https://github.com/AntonioFasano/filleR/blob/master/filleR.r),   [Apache pdfbox-app-x.y.z.jar](https://pdfbox.apache.org/download.cgi). 
 
+You can now issue in in R:
 
-
-To generate the filled PDF. 
-
-Put in the same directory `form.pdf`, `form.csv`, the  [filleR.R script](https://github.com/AntonioFasano/filleR/blob/master/filleR.r), [pdfbox-app-1.8.7.jar](https://pdfbox.apache.org/download.cgi). 
-
-Note: If you use a more recent version of pdfbox-app, adjust accordingly the `filler.R` line:
-
-    PDFBOX="pdfbox-app-1.8.7.jar"
-
-
-To get the filled PDF,  run in R:
-
+    setwd("path/to/script dir")
     source("path/to/filleR.R")
     makePdf("form.pdf", "form.csv", "filled.pdf")
 
-Depending on `getwd()`, adjust "path/to/filleR.R" and you should get the output PDF `filled.pdf`.
+Adjust `setwd("path/to/script dir")` as needed. 
+
+If the Java binary executable is in your path, you  get the output PDF `filled.pdf`.  
+Note: to manage executable paths see the specific section ahead.
 
 
-Note: if the Java binary is not in your path, add its directory with:
-
-	Sys.setenv(PATH = paste(Sys.getenv("PATH"), "path\\to\\java\\binary-dir", sep=.Platform$path.sep))
 
 If your `form.pdf` is not A4, use:
 
@@ -100,6 +89,40 @@ Replace `M` with  the amount by which text should be magnified relative to the d
 
 Replace `F` with  an integer  specifying the font to use. Normally  1 corresponds to plain text (the default), 2 to bold face, 3 to italic and 4 to bold italic.  See R `par` function for more insights.
 		  
+
+Customise executable paths 
+--------------------------
+
+filleR finds the Java binary executable first via the R variable 
+
+	JAVABIN="path/to/java-executable"
+
+If you don't set it, filleR uses system environment variable `JAVA_HOME`. When set, its value is the path of the directory containing the `bin` directory containing in turn the Java executable. 
+
+Besides setting `JAVA_HOME` through the operating system, so that R will inherit it, it is possible to set it in R with: 
+
+	Sys.setenv(JAVA_HOME = "path\\to\\java")
+
+
+This value will last only for the R session. 
+
+If `JAVA_HOME` is not set, R will resort to system path. Again it is possible to Java executable directory to the system path environment variable in R:
+
+
+	Sys.setenv(PATH = paste(Sys.getenv("PATH"), "path\\to\\java\\binary-dir", sep=.Platform$path.sep))
+
+Agan this setting is only limted to R session. 
+
+
+
+As regards the JAR file `pdfbox-app-x.y.z.jar`, it is first found  filleR by setting the R variable:
+
+	PDFBOX="path/to/pdfbox-app-x.y.z.jar"
+
+
+If this variable is not set, filleR looks in the current directory (which might differ from filleR directory) and if still not found it looks into the filleR directory.
+
+
 
 How things work internally
 ==========================
