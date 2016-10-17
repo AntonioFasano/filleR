@@ -10,7 +10,7 @@ MAGNI=0.7     # Text magnification factor
 FONT=1        # Font: 1 helvetica regular, 2 Helv. bold, ... 6 Times  
 ####################################################################################
 
-
+#Git: pdfbox-app: v.2, Overlay is OverlayPDF - makePdf: is makeFilled
 
 ## Internal Globals -  Do not modify
 FILLERDIR=NULL   # Script dir
@@ -101,9 +101,7 @@ search.java.exe=function(){
 }
 
 
-
-## makePdf("form.tpl.pdf", "form.csv", "form-filled.pdf")
-makePdf=function(
+makeFilled=function(        # Main function to generate filled form
     form.tpl,               # Input form to be filled (single page)
     pdfdata.csv,            # CSV data source 
     filled.form,            # The output filled form
@@ -160,7 +158,7 @@ makePdf=function(
   
 
     ## Overlay temp1 over temp2
-    (cmd = paste(PDFBOX, "Overlay", dQuote(temp1), dQuote(temp), dQuote(temp.nocov)))
+    (cmd = paste(PDFBOX, "OverlayPDF", dQuote(temp1), dQuote(temp), dQuote(temp.nocov)))
     try(system(cmd, intern = TRUE))
 
     ## Add cover if any
