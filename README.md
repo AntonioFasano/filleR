@@ -333,9 +333,9 @@ The template for the CSV data to print is as follows:
     -1
     ... start again
 
-For a usable 2-page CSV see [here](https://github.com/AntonioFasano/filleR/blob/master/form.csv).
+For a usable 2-page CSV see [here](https://github.com/AntonioFasano/filleR/blob/master/example/pdfdata.csv).
 
-Here is the form [before](https://github.com/AntonioFasano/filleR/blob/master/form.pdf) and [after](https://github.com/AntonioFasano/filleR/blob/master/form-filled.pdf) filling (unfortunately not in English).
+Here is the form [before](https://github.com/AntonioFasano/filleR/blob/master/example/template.pdf) and [after](https://github.com/AntonioFasano/filleR/blob/master/example/form-filled.pdf) filling (unfortunately not in English).
 
 First of all, to keep track of pages used,  we have to add a page counter every time we call `plot.new`. So it could be a good idea to define a new-page function:
 
@@ -371,27 +371,14 @@ So we run:
     try(system(cmd, intern = TRUE))
 
 
-We can now overlay the overlay PDF on the temporary PDF  by means  the homonymous command [Overlay](http://pdfbox.apache.org/commandline/):
+We can now overlay the overlay PDF on the temporary PDF  by means  the homonymous command [OverlayPDF](http://pdfbox.apache.org/commandline/):
 
     java -jar pdfbox-app-x.y.z.jar Overlay <overlay.pdf> <document.pdf> <result.pdf>
 	
 That is:
 
-    cmd=paste(PDFBOX, 'Overlay', OVER, TEMP, FILLED)
+    cmd=paste(PDFBOX, 'OverlayPDF', OVER, TEMP, FILLED)
     try(system(cmd, intern = TRUE))
-
-Some optional bells and whistles with [PDFReader](http://pdfbox.apache.org/commandline/):
-
-    cmd=paste(PDFBOX, 'PDFReader', FILLED)
-    try(system(cmd, intern = TRUE))
-
-
-Read the full code on github [FilleR](https://github.com/AntonioFasano/filleR/blob/master/filleR.r). 
-
-
-
-Final considerations
-====================
 
 
 <!-- Replace with WP code style    -->

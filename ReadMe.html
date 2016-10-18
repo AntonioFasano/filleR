@@ -193,8 +193,8 @@ dev.off()                                      #Save overlay PDF</code></pre>
 ... 4 like this per page
 -1
 ... start again</code></pre>
-<p>For a usable 2-page CSV see <a href="https://github.com/AntonioFasano/filleR/blob/master/form.csv">here</a>.</p>
-<p>Here is the form <a href="https://github.com/AntonioFasano/filleR/blob/master/form.pdf">before</a> and <a href="https://github.com/AntonioFasano/filleR/blob/master/form-filled.pdf">after</a> filling (unfortunately not in English).</p>
+<p>For a usable 2-page CSV see <a href="https://github.com/AntonioFasano/filleR/blob/master/example/pdfdata.csv">here</a>.</p>
+<p>Here is the form <a href="https://github.com/AntonioFasano/filleR/blob/master/example/template.pdf">before</a> and <a href="https://github.com/AntonioFasano/filleR/blob/master/example/form-filled.pdf">after</a> filling (unfortunately not in English).</p>
 <p>First of all, to keep track of pages used, we have to add a page counter every time we call <code>plot.new</code>. So it could be a good idea to define a new-page function:</p>
 <pre><code>PAGE.COUNT=0
 ....
@@ -214,16 +214,11 @@ TEMP=&#39;temp.pdf&#39;; FORM=&#39;form.pdf&#39;; FILLED=&#39;form-filled.pdf&#3
 <pre><code>cmd=paste(rep(FORM, PAGE.COUNT), collapse=&#39; &#39;)
 cmd=paste(PDFBOX,  &#39;PDFMerger&#39;,  cmd, TEMP)
 try(system(cmd, intern = TRUE))</code></pre>
-<p>We can now overlay the overlay PDF on the temporary PDF by means the homonymous command <a href="http://pdfbox.apache.org/commandline/">Overlay</a>:</p>
+<p>We can now overlay the overlay PDF on the temporary PDF by means the homonymous command <a href="http://pdfbox.apache.org/commandline/">OverlayPDF</a>:</p>
 <pre><code>java -jar pdfbox-app-x.y.z.jar Overlay &lt;overlay.pdf&gt; &lt;document.pdf&gt; &lt;result.pdf&gt;</code></pre>
 <p>That is:</p>
-<pre><code>cmd=paste(PDFBOX, &#39;Overlay&#39;, OVER, TEMP, FILLED)
+<pre><code>cmd=paste(PDFBOX, &#39;OverlayPDF&#39;, OVER, TEMP, FILLED)
 try(system(cmd, intern = TRUE))</code></pre>
-<p>Some optional bells and whistles with <a href="http://pdfbox.apache.org/commandline/">PDFReader</a>:</p>
-<pre><code>cmd=paste(PDFBOX, &#39;PDFReader&#39;, FILLED)
-try(system(cmd, intern = TRUE))</code></pre>
-<p>Read the full code on github <a href="https://github.com/AntonioFasano/filleR/blob/master/filleR.r">FilleR</a>.</p>
-<h1 id="final-considerations">Final considerations</h1>
 <!-- Replace with WP code style    -->
 <!-- (query-replace-regexp  "<pre><code>"  "[code language=\"r\"]")  -->
 <!-- (query-replace-regexp  "</code></pre>"  "[/code]") -->
