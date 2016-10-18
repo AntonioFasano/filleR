@@ -2,12 +2,12 @@
 <p>Filling a (flat) PDF form with data from a CSV file in R</p>
 <h1 id="motivation">Motivation</h1>
 <p>As you might know thanks to <a href="http://yihui.name/knitr/">knitr</a> package it is possible to generate data driven reports in R.</p>
-<p>Anyway there are situations when you already have a PDF template intended to be filled. Instead of creating a new filled PDF from scratch, it might be better to use R just to duplicate the existing form template and write the filling data over the PDF forms.<br />
-Note the here by PDF form to be filled I mean a <em>flat</em> form, not the special file type hosting form fields.</p>
-<p>This strategy is particularly useful when, for legal/administrative reasons, you are required to exactly replicate exactly the original (complex) form.</p>
+<p>Anyway there are situations when you already have a PDF form intended to be filled and, instead of creating a new filled PDF from scratch, it might be better to use R just to write the filling data over (duplicates of) the existing PDF template.<br />
+This strategy is particularly useful when, for legal/administrative reasons, you are required to replicate exactly the original (complex) form.</p>
+<p>Note: here by PDF form to be filled I mean a <em>flat</em> form, not the special file type hosting form fields.</p>
 <h1 id="requirements">Requirements</h1>
 <p>Apart from R, you need <a href="https://pdfbox.apache.org/">Apache PDFBox</a> and a Java runtime environment.</p>
-<p>To position your text properly on the PDF you may take advantage of the <em>distance</em> tools present in many PDF applications, including some free ones; unless you may want to print your form and use a ruler or proceed by trail and error.</p>
+<p>Besides, to position your text properly on the PDF you may take advantage of the <em>distance</em> tools present in many PDF applications, including some free ones; unless you may want to print your form and use a ruler or proceed by trial and error.</p>
 <p><a href="http://i.imgur.com/IT4IOgc.png?1">this image</a> shows a distance tool in action using the free <a href="http://www.tracker-software.com/product/pdf-xchange-viewer">PDF-XChange Viewer</a>.</p>
 <p>Among the free viewers for Windows, you might consider <a href="https://www.tracker-software.com">PDF-XChange Editor</a> or <a href="https://www.foxitsoftware.com">Foxit Reader</a>.</p>
 <h1 id="usage">Usage</h1>
@@ -26,17 +26,16 @@ Note the here by PDF form to be filled I mean a <em>flat</em> form, not the spec
 <p>The first line is just a header, without actual content.<br />
 Lines like <code>x,y,text,</code> set the x-y coordinates in inches for placing the following <code>text</code> on a PDF page based on <code>form.pdf</code>, that is, <code>x</code>, <code>y</code> measure respectively the distance in inches from the left, bottom page border.<br />
 Lines like <code>x,y,text,length</code> are justified by splitting them in a new line every <code>length</code> characters.<br />
-<code>-1,,,</code> stands for a page break, therefore a new page like <code>form.pdf</code>is added to the PDF file and the following lines will be printed on it.</p>
-<p>To generate the filled PDF.</p>
-<p>Put in the same directory <code>form.pdf</code>, <code>form.csv</code>, the <a href="https://github.com/AntonioFasano/filleR/blob/master/filleR.r">filleR.R script</a>, <a href="https://pdfbox.apache.org/download.cgi">pdfbox-app-1.8.7.jar</a>.</p>
-<p>Note: If you use a more recent version of pdfbox-app, adjust accordingly the <code>filler.R</code> line:</p>
-<pre><code>PDFBOX=&quot;pdfbox-app-1.8.7.jar&quot;</code></pre>
-<p>To get the filled PDF, run in R:</p>
-<pre><code>source(&quot;path/to/filleR.R&quot;)
+<code>-1,,,</code> stands for a page break, therefore a new page like <code>form.pdf</code>is added to the PDF file and the following lines will be printed on it.<br />
+Note: CSV outmost commas are not really necessary. Therefore you can write <code>-1</code> for <code>-1,,,</code>.</p>
+<p>In order to generate the filled PDF, put in the same directory <code>form.pdf</code>, <code>form.csv</code>, the <a href="https://github.com/AntonioFasano/filleR/blob/master/filleR.r">filleR.R script</a>, <a href="https://pdfbox.apache.org/download.cgi">Apache pdfbox-app-x.y.z.jar</a>.</p>
+<p>You can now issue in in R:</p>
+<pre><code>setwd(&quot;path/to/script dir&quot;)
+source(&quot;path/to/filleR.R&quot;)
 makePdf(&quot;form.pdf&quot;, &quot;form.csv&quot;, &quot;filled.pdf&quot;)</code></pre>
-<p>Depending on <code>getwd()</code>, adjust &quot;path/to/filleR.R&quot; and you should get the output PDF <code>filled.pdf</code>.</p>
-<p>Note: if the Java binary is not in your path, add its directory with:</p>
-<pre><code>Sys.setenv(PATH = paste(Sys.getenv(&quot;PATH&quot;), &quot;path\\to\\java\\binary-dir&quot;, sep=.Platform$path.sep))</code></pre>
+<p>Adjust <code>setwd(&quot;path/to/script dir&quot;)</code> as needed.</p>
+<p>If the Java binary executable is in your path, you get the output PDF <code>filled.pdf</code>.<br />
+Note: to manage executable paths see the specific section ahead.</p>
 <p>If your <code>form.pdf</code> is not A4, use:</p>
 <pre><code>makePdf(&quot;form.pdf&quot;, &quot;form.csv&quot;, &quot;filled.pdf&quot;, width=X, height=Y) </code></pre>
 <p>Replace<code>X</code> and <code>Y</code> with the page width and height in inches.</p>
@@ -45,6 +44,19 @@ makePdf(&quot;form.pdf&quot;, &quot;form.csv&quot;, &quot;filled.pdf&quot;)</cod
 FONT=F </code></pre>
 <p>Replace <code>M</code> with the amount by which text should be magnified relative to the default, current value is <code>0.7</code>.</p>
 <p>Replace <code>F</code> with an integer specifying the font to use. Normally 1 corresponds to plain text (the default), 2 to bold face, 3 to italic and 4 to bold italic. See R <code>par</code> function for more insights.</p>
+<h2 id="customise-executable-paths">Customise executable paths</h2>
+<p>filleR finds the Java binary executable first via the R variable</p>
+<pre><code>JAVABIN=&quot;path/to/java-executable&quot;</code></pre>
+<p>If you don't set it, filleR uses system environment variable <code>JAVA_HOME</code>. When set, its value is the path of the directory containing the <code>bin</code> directory containing in turn the Java executable.</p>
+<p>Besides setting <code>JAVA_HOME</code> through the operating system, so that R will inherit it, it is possible to set it in R with:</p>
+<pre><code>Sys.setenv(JAVA_HOME = &quot;path\\to\\java&quot;)</code></pre>
+<p>This value will last only for the R session.</p>
+<p>If <code>JAVA_HOME</code> is not set, R will resort to system path. Again it is possible to Java executable directory to the system path environment variable in R:</p>
+<pre><code>Sys.setenv(PATH = paste(Sys.getenv(&quot;PATH&quot;), &quot;path\\to\\java\\binary-dir&quot;, sep=.Platform$path.sep))</code></pre>
+<p>Agan this setting is only limted to R session.</p>
+<p>As regards the JAR file <code>pdfbox-app-x.y.z.jar</code>, it is first found filleR by setting the R variable:</p>
+<pre><code>PDFBOX=&quot;path/to/pdfbox-app-x.y.z.jar&quot;</code></pre>
+<p>If this variable is not set, filleR looks in the current directory (which might differ from filleR directory) and if still not found it looks into the filleR directory.</p>
 <h1 id="how-things-work-internally">How things work internally</h1>
 <p>R generates the PDF files containing the text, which are like plots with labels only.<br />
 Apache pdfbox-app juxtaposes text PDF files over the related PDF templates.</p>
