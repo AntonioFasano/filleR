@@ -10,7 +10,7 @@ MAGNI=0.7     # Text magnification factor
 FONT=1        # Font: 1 helvetica regular, 2 Helv. bold, ... 6 Times  
 ####################################################################################
 
-#Git: pdfbox-app: v.2, Overlay is OverlayPDF - makePdf: is makeFilled
+#Git log: filleR.R: improved FILLERDIR detection
 
 ## Internal Globals -  Do not modify
 FILLERDIR=NULL   # Script dir
@@ -18,14 +18,23 @@ PAGE.COUNT=0     # Total pages counter
 
 
 
-## filleR invoked with standard source("path/to/filleR.R") 
-FILLERDIR=sys.frame(1)$ofile
-    
-## filleR invoked with Emacs ESS "ess-load-file" or "C-c C-l"
-if(is.null(FILLERDIR)) FILLERDIR=local({
-    x=grep(".ess.source", sys.calls())[1]
+## Get filleR dir invoked with standard source("path/to/filleR.R") 
+FILLERDIR=local({
+    x=grep("^(.ess.)?source", sys.calls())
+    x=rev(x)[1]
     sys.call(x)[[2]]
 })
+
+
+
+#print(sys.call(x)[[2]])
+
+
+## filleR invoked with Emacs ESS "ess-load-file" or "C-c C-l"
+#if(is.null(FILLERDIR)) FILLERDIR=local({
+#    x=grep(".ess.source", sys.calls())[1]
+#    sys.call(x)[[2]]
+#})
     
 ## Get script directory  
 if(!is.null(FILLERDIR)){
